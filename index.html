@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gift Tracker – every US holiday</title>
+<meta name="theme-color" content="#c8283f">
+<meta name="description" content="Plan, budget and track gifts for every US holiday. Works offline.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" id="fav" href="icon.svg">
+<style>
+:root{--bg:#f6f5f9;--sf:rgba(255,255,255,.74);--ink:#15131c;--mu:#6d6a7c;--ln:rgba(21,19,28,.09);--a:#c8283f;--b:#1f7a52;--ok:#1f9d6a;--bad:#e5484d;color-scheme:light}
+[data-t=dark]{--bg:#0b0a10;--sf:rgba(31,29,41,.66);--ink:#f5f3fa;--mu:#9d9aae;--ln:rgba(255,255,255,.1);--ok:#4fd1a0;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 ui-sans-serif,-apple-system,"SF Pro Text","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:100px;transition:background .3s}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(60% 45% at 8% -5%,color-mix(in srgb,var(--a) 30%,transparent),transparent),radial-gradient(50% 40% at 100% 0,color-mix(in srgb,var(--b) 24%,transparent),transparent)}
+h1,h2,h3{margin:0;letter-spacing:-.02em}
+.top{position:sticky;top:0;z-index:5;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:color-mix(in srgb,var(--bg) 72%,transparent);border-bottom:1px solid var(--ln)}
+.tin{max-width:1100px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:10px}
+.brand{font-weight:800;font-size:18px;letter-spacing:-.03em;display:flex;gap:8px;align-items:center}
+.sp{flex:1}
+.tg{width:58px;height:32px;border-radius:99px;border:1px solid var(--ln);background:var(--sf);position:relative;cursor:pointer;padding:0;flex:none}
+.tg i{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--b));display:grid;place-items:center;font-style:normal;font-size:13px;transition:transform .25s}
+[data-t=dark] .tg i{transform:translateX(26px)}
+main{max-width:1100px;margin:0 auto;padding:18px 20px}
+nav{display:flex;gap:4px;background:var(--sf);border:1px solid var(--ln);border-radius:99px;padding:4px;width:max-content;max-width:100%;margin:18px auto 0;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+nav button{border:0;background:none;color:var(--mu);font:inherit;font-weight:600;padding:8px 16px;border-radius:99px;cursor:pointer;display:flex;gap:6px;align-items:center}
+nav button.on{background:var(--ink);color:var(--bg)}
+.c{background:var(--sf);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border:1px solid var(--ln);border-radius:20px;padding:18px}
+.c h2{font-size:17px;margin-bottom:10px}
+.g{display:grid;gap:14px}.g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}.g3{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}.mt{margin-top:14px}
+.hero{position:relative;overflow:hidden;border-radius:28px;padding:28px;color:#fff;background:linear-gradient(135deg,var(--a),color-mix(in srgb,var(--a) 45%,var(--b)) 55%,var(--b));min-height:210px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;box-shadow:0 20px 50px -20px var(--a)}
+.hero .em{position:absolute;right:22px;top:14px;font-size:50px;display:flex;gap:6px;filter:drop-shadow(0 8px 10px rgba(0,0,0,.25))}
+.em span:nth-child(odd){transform:rotate(-9deg) translateY(4px)}.em span:nth-child(even){transform:rotate(8deg)}
+.dn{font-size:88px;font-weight:800;line-height:.95;letter-spacing:-.06em}
+.hs{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);padding:8px 14px;border-radius:99px;font-weight:600;font-size:14px;backdrop-filter:blur(8px)}
+.lab{font-size:13px;color:var(--mu)}.big{font-size:28px;font-weight:800;letter-spacing:-.03em}.neg{color:var(--bad)}
+.rings{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;text-align:center}
+.ring{position:relative;width:96px;height:96px;margin:0 auto 6px}.ring svg{transform:rotate(-90deg)}.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:19px}
+.chart{display:flex;align-items:flex-end;gap:12px;height:170px;overflow-x:auto}
+.col{flex:1;min-width:48px;text-align:center}.bars{height:140px;display:flex;align-items:flex-end;justify-content:center;gap:3px}.bars i{width:14px;border-radius:6px 6px 0 0;display:block}
+.col span{font-size:12px;color:var(--mu);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.key{font-size:12px;color:var(--mu);display:flex;gap:14px;margin-top:8px}.key i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+.btn{font:inherit;font-weight:600;border:1px solid var(--ln);background:var(--sf);color:var(--ink);padding:9px 15px;border-radius:12px;cursor:pointer}
+.btn.pri{background:linear-gradient(135deg,var(--a),color-mix(in srgb,var(--a) 55%,var(--b)));border-color:transparent;color:#fff}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--b);outline-offset:2px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:14px 0}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--sf);border:1px solid var(--ln);border-radius:12px;padding:9px 11px;width:100%}
+.bar input,.bar select,.top select{width:auto}.top select{max-width:170px;font-weight:600}
+.tw{overflow-x:auto;border-radius:20px}.tw.c{padding:0}
+table{border-collapse:collapse;width:100%;min-width:820px}
+th{font-size:12px;color:var(--mu);text-align:left;padding:12px;border-bottom:1px solid var(--ln);font-weight:600}
+td{padding:10px 12px;border-bottom:1px solid var(--ln)}tr:last-child td{border:0}
+td.n{text-align:right;font-variant-numeric:tabular-nums}td.k,th.k{text-align:center}td.a{white-space:nowrap;text-align:right}tr.d td{color:var(--mu)}
+input[type=checkbox]{width:18px;height:18px;accent-color:var(--ok);padding:0}
+.lk{background:none;border:0;color:var(--a);cursor:pointer;font:inherit;font-weight:600;padding:2px 6px}.lk.x{color:var(--bad)}
+.pill{display:inline-block;font-size:12px;padding:2px 10px;border-radius:99px;background:var(--bg);color:var(--mu);border:1px solid var(--ln)}
+.pb{height:8px;background:var(--ln);border-radius:9px;overflow:hidden;margin:8px 0}.pb i{display:block;height:100%;background:var(--ok);border-radius:9px}.pb.o i{background:var(--bad)}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.st button{background:none;border:0;font-size:18px;cursor:pointer;color:var(--ln);padding:0 1px}.st button.on{color:#f0b429}
+.ls .ln{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px dashed var(--ln)}.ls .ln:last-child{border:0}.ls label{display:flex;gap:10px;align-items:center;flex:1}
+.hp{border:0;color:#fff;border-radius:22px;padding:20px;text-align:left;cursor:pointer;font:inherit;display:flex;flex-direction:column;gap:2px;box-shadow:0 14px 30px -16px rgba(0,0,0,.5)}
+.hp b{font-size:17px}.hp span{opacity:.85;font-size:13px}.hp .i{font-size:38px;margin-bottom:6px}
+.e{text-align:center;padding:36px 16px}
+dialog{border:1px solid var(--ln);border-radius:20px;background:var(--bg);color:var(--ink);padding:22px;width:min(430px,92vw)}
+dialog::backdrop{background:rgba(0,0,0,.5);backdrop-filter:blur(3px)}
+dialog h2{margin-bottom:12px}dialog label,.set label{display:block;font-size:13px;color:var(--mu);margin-bottom:10px}dialog .row{justify-content:flex-end;margin-top:14px}
+#toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}#toast.on{opacity:1}
+@media(max-width:760px){nav{position:fixed;bottom:max(12px,env(safe-area-inset-bottom));left:12px;right:12px;margin:0;width:auto;z-index:6;justify-content:space-between;box-shadow:0 14px 34px rgba(0,0,0,.3)}nav button{flex-direction:column;gap:0;padding:6px 4px;font-size:11px;flex:1;align-items:center}nav button span{font-size:18px}.hero .em{font-size:36px}.dn{font-size:68px}}
+@media print{.top,nav,.bar,#toast{display:none!important}body{background:#fff;color:#000}body::before{display:none}.c{border-color:#999;break-inside:avoid}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top"><div class="tin" id="top"></div></header>
+<nav id="nav" aria-label="Sections"></nav>
+<main id="main"></main>
+<dialog id="dlg"></dialog>
+<input type="file" id="file" accept=".json" hidden>
+<div id="toast" role="status"></div>
+<script>
+const $=s=>document.querySelector(s),uid=()=>Math.random().toString(36).slice(2,9);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/* ---------- US holidays ---------- */
+const nth=(y,mo,dw,n)=>new Date(y,mo,1+((dw-new Date(y,mo,1).getDay()+7)%7)+7*(n-1));
+function easter(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,mm=Math.floor((a+11*h+22*l)/451),t=h+l-7*mm+114;return new Date(y,Math.floor(t/31)-1,t%31+1)}
+function hanuk(y){const f=new Intl.DateTimeFormat('en-u-ca-hebrew',{month:'long',day:'numeric'});for(let d=new Date(y,10,24);d<new Date(y,11,31);d.setDate(d.getDate()+1)){const o=Object.fromEntries(f.formatToParts(d).map(x=>[x.type,x.value]));if(/kislev/i.test(o.month)&&o.day==='25')return new Date(d)}return new Date(y,11,25)}
+const H=[
+{id:'xmas',n:'Christmas',e:['🎄','🎁','⭐','🧦','🦌'],a:'#c8283f',b:'#1f7a52',d:y=>new Date(y,11,25)},
+{id:'hanu',n:'Hanukkah',e:['🕎','✡️','🕯️','🪙','💙'],a:'#2f6fe0',b:'#d9a62e',d:hanuk},
+{id:'nye',n:'New Year’s',e:['🥂','🎉','🎊','✨','🕛'],a:'#b8921c',b:'#4f5fd6',d:y=>new Date(y,0,1)},
+{id:'val',n:'Valentine’s Day',e:['💝','🌹','💌','🍫','💘'],a:'#e0386b',b:'#ff8fab',d:y=>new Date(y,1,14)},
+{id:'east',n:'Easter',e:['🐣','🌷','🥚','🐰','🌸'],a:'#8e5cd9',b:'#3fb592',d:easter},
+{id:'mom',n:'Mother’s Day',e:['💐','🌸','🌷','💖','🧁'],a:'#d9488f',b:'#f2a0c3',d:y=>nth(y,4,0,2)},
+{id:'dad',n:'Father’s Day',e:['👔','🏌️','🔧','🍔','⌚'],a:'#2d5da8',b:'#9a7b3f',d:y=>nth(y,5,0,3)},
+{id:'jul',n:'Independence Day',e:['🎆','🇺🇸','🦅','🌭','🎇'],a:'#c1272d',b:'#1f3f8f',d:y=>new Date(y,6,4)},
+{id:'hal',n:'Halloween',e:['🎃','👻','🦇','🕸️','🍬'],a:'#f07a1a',b:'#7b4bd1',d:y=>new Date(y,9,31)},
+{id:'thx',n:'Thanksgiving',e:['🦃','🍂','🥧','🌽','🍁'],a:'#c8641e',b:'#8a5a2b',d:y=>nth(y,10,4,4)},
+{id:'any',n:'Birthday / Custom',e:['🎂','🎈','🎁','🎉','🥳'],a:'#6c5ce7',b:'#00b5a0',d:()=>new Date(Date.now()+30*864e5)}];
+const HD=id=>H.find(h=>h.id===id)||H[0];
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+function nextDate(h){const t=new Date();t.setHours(0,0,0,0);const y=t.getFullYear();let d=h.d(y);if(d<t)d=h.d(y+1);return d}
+/* ---------- state & saving ---------- */
+const KEY='gift-tracker-pro-v2';let mem=null,persisted=null;
+const blank=()=>({v:2,dark:!!(window.matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches),cur:'$',tax:0,lists:[],sel:'',people:[],gifts:[],ideas:[],saved:0});
+function load(){try{const r=localStorage.getItem(KEY);if(r)return Object.assign(blank(),JSON.parse(r))}catch(e){}return mem?JSON.parse(mem):blank()}
+function save(){S.saved=Date.now();const j=JSON.stringify(S);mem=j;try{localStorage.setItem(KEY,j)}catch(e){toast('Could not save. Browser storage is full or blocked.')}}
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist().then(r=>{persisted=r})}catch(e){}
+let S=load(),tab=S.lists.length?'dash':'pick',F={q:'',pid:'',st:''},inst=null;
+const L=()=>S.lists.find(l=>l.id===S.sel)||S.lists[0];
+const GS=()=>S.gifts.filter(g=>g.eid===L().id),IS=()=>S.ideas.filter(i=>i.eid===L().id);
+const m=n=>S.cur+(+n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pname=id=>(S.people.find(p=>p.id===id)||{name:'Anyone'}).name;
+const pbud=p=>+(L().pb||{})[p.id]||0,sum=a=>a.reduce((t,x)=>t+(+x.price||0),0);
+const daysTo=l=>Math.ceil((new Date(l.date+'T00:00:00')-new Date().setHours(0,0,0,0))/864e5);
+function stats(){const g=GS(),l=L(),planned=sum(g),spent=sum(g.filter(x=>x.bought)),total=+l.budget||S.people.reduce((t,p)=>t+pbud(p),0);return{planned,spent,total,left:total-spent,n:g.length,b:g.filter(x=>x.bought).length,w:g.filter(x=>x.wrapped).length,s:g.filter(x=>x.sent).length}}
+const pp=p=>{const gs=GS().filter(g=>g.pid===p.id);return{planned:sum(gs),spent:sum(gs.filter(g=>g.bought)),n:gs.length}};
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2400)}
+function ring(l,v,of,c){const p=of?Math.min(v/of,1):0,r=40,C=2*Math.PI*r;return`<div><div class="ring"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="${r}" fill="none" stroke="var(--ln)" stroke-width="9"/><circle cx="48" cy="48" r="${r}" fill="none" stroke="${c}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C*p} ${C}"/></svg><b>${Math.round(p*100)}%</b></div><div class="lab"><b style="color:var(--ink)">${l}</b><br>${v} of ${of}</div></div>`}
+const GR=['Family','Friends','Coworkers','Kids','Teachers','Other'],DL=['In person','Mail','Pickup','Digital'],CT=['Clothing','Tech','Toys','Home','Beauty','Food','Experience','Books','Other'];
+/* ---------- views ---------- */
+const tabs=[['dash','📊','Home'],['gifts','🎁','Gifts'],['people','👥','People'],['ideas','💡','Ideas'],['shop','🛒','Shop'],['set','⚙️','Settings']];
+const empty=()=>`<div class="c e mt"><h2>Add your first recipient</h2><p class="lab">Or load a sample list to see how it all works.</p><button class="btn pri" data-act="addPerson">Add a recipient</button> <button class="btn" data-act="sample">Load sample list</button></div>`;
+const views={
+pick(){return`<div class="e"><h1 style="font-size:32px">What are you shopping for?</h1><p class="lab">Pick an occasion. The colors, icons and countdown change to match. Add as many lists as you like.</p></div><div class="g g3">${H.map(h=>`<button class="hp" data-act="newList" data-id="${h.id}" style="background:linear-gradient(135deg,${h.a},${h.b})"><div class="i">${h.e[0]}${h.e[1]}</div><b>${h.n}</b><span>${nextDate(h).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span></button>`).join('')}</div>${S.lists.length?'':'<div class="e"><button class="btn" data-act="sample">Or load a sample Christmas list</button></div>'}`},
+dash(){const l=L(),h=HD(l.hid),t=stats(),dn=daysTo(l);
+ const mx=Math.max(1,...S.people.flatMap(p=>[pbud(p),pp(p).planned])),over=S.people.filter(p=>pbud(p)>0&&pp(p).planned>pbud(p)),todo=GS().filter(g=>!g.bought).slice(0,6),C={};GS().forEach(g=>C[g.cat||'Other']=(C[g.cat||'Other']||0)+(+g.price||0));
+ const cm=Math.max(1,...Object.values(C)),tx=t.planned*(+S.tax||0)/100;
+ return`<section class="hero"><div class="em">${h.e.map(x=>`<span>${x}</span>`).join('')}</div><div><div style="font-weight:600;opacity:.9">${esc(l.name)}</div><div class="dn">${Math.max(dn,0)}</div><div style="font-weight:600">${dn>1?'days to go':dn===1?'day to go':dn===0?'It’s today!':'This date has passed'}</div></div><div class="hs">${t.b} of ${t.n} bought · ${t.s} sent</div></section>
+ ${!S.people.length?empty():`<div class="g g4 mt"><div class="c"><div class="lab">Total budget</div><div class="big">${m(t.total)}</div></div><div class="c"><div class="lab">Spent so far</div><div class="big">${m(t.spent)}</div></div><div class="c"><div class="lab">Left to spend</div><div class="big ${t.left<0?'neg':''}">${m(t.left)}</div></div><div class="c"><div class="lab">Planned gifts</div><div class="big">${m(t.planned)}</div>${tx?`<div class="lab">≈ ${m(t.planned+tx)} with ${S.tax}% sales tax</div>`:''}</div></div>
+ <div class="c mt"><div class="rings">${ring('Bought',t.b,t.n,'var(--a)')}${ring('Wrapped',t.w,t.n,'var(--b)')}${ring('Sent',t.s,t.n,'var(--ok)')}</div></div>
+ <div class="c mt"><h2>Budget vs planned</h2><div class="chart">${S.people.map(p=>{const x=pp(p),b=pbud(p);return`<div class="col"><div class="bars"><i style="height:${b/mx*100}%;background:var(--b)"></i><i style="height:${x.planned/mx*100}%;background:${b>0&&x.planned>b?'var(--bad)':'var(--a)'}"></i></div><span>${esc(p.name)}</span></div>`}).join('')}</div><div class="key"><span><i style="background:var(--b)"></i>Budget</span><span><i style="background:var(--a)"></i>Planned</span><span><i style="background:var(--bad)"></i>Over budget</span></div></div>
+ <div class="g g3 mt"><div class="c"><h2>Over budget</h2>${over.length?over.map(p=>`<div class="row"><span>${esc(p.name)}</span><b class="neg">+${m(pp(p).planned-pbud(p))}</b></div>`).join(''):'<p class="lab">Everyone is within budget.</p>'}</div>
+ <div class="c"><h2>Still to buy</h2>${todo.length?todo.map(g=>`<div class="row"><span>${esc(pname(g.pid))}: ${esc(g.item)}</span><span class="lab">${m(g.price)}</span></div>`).join(''):'<p class="lab">Everything is bought.</p>'}</div>
+ <div class="c"><h2>By category</h2>${Object.keys(C).length?Object.entries(C).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="row"><span>${k}</span><span class="lab">${m(v)}</span></div><div class="pb"><i style="width:${v/cm*100}%;background:var(--a)"></i></div>`).join(''):'<p class="lab">No gifts yet.</p>'}</div></div>`}`},
+gifts(){return`<div class="bar"><input data-f="q" placeholder="Search gifts, people, stores" aria-label="Search" value="${esc(F.q)}"><select data-f="pid" aria-label="Recipient"><option value="">All recipients</option>${S.people.map(p=>`<option value="${p.id}" ${F.pid===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</select><select data-f="st" aria-label="Status">${[['','Any status'],['todo','Still to buy'],['bought','Bought'],['wrapped','Wrapped'],['sent','Sent']].map(o=>`<option value="${o[0]}" ${F.st===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select><span class="sp"></span><button class="btn pri" data-act="addGift">Add gift</button></div>
+ <div class="tw c"><table><thead><tr><th>Recipient</th><th>Gift</th><th>Store</th><th>Category</th><th class="k">Price</th><th class="k">Bought</th><th class="k">Wrapped</th><th class="k">Sent</th><th>Delivery</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>`},
+people(){return`<div class="bar"><span class="lab">Budgets here apply to “${esc(L().name)}”.</span><span class="sp"></span><button class="btn pri" data-act="addPerson">Add recipient</button></div>${S.people.length?`<div class="g g3">${S.people.map(p=>{const x=pp(p),b=pbud(p),o=b>0&&x.planned>b;return`<div class="c"><div class="row"><h2 style="margin:0">${esc(p.name)}</h2><span class="pill">${esc(p.group)}</span></div><div class="pb ${o?'o':''}"><i style="width:${b?Math.min(x.planned/b*100,100):0}%"></i></div><div class="row"><span class="lab">${m(x.planned)} of ${m(b)}</span>${o?`<b class="neg">Over by ${m(x.planned-b)}</b>`:`<span class="lab">${m(b-x.planned)} left</span>`}</div>${p.notes?`<p class="lab" style="margin:8px 0 0">📝 ${esc(p.notes)}</p>`:''}<div class="row" style="margin-top:8px"><span class="lab">${x.n} gifts · ${m(x.spent)} spent</span><span><button class="lk" data-act="editPerson" data-id="${p.id}">Edit</button><button class="lk x" data-act="delPerson" data-id="${p.id}">Remove</button></span></div></div>`}).join('')}</div>`:empty()}`},
+ideas(){const I=IS();return`<div class="bar"><span class="lab">Save ideas before you commit to buying.</span><span class="sp"></span><button class="btn pri" data-act="addIdea">Add idea</button></div>${I.length?`<div class="g g3">${I.map(i=>`<div class="c"><div class="row"><b>${esc(i.item)}</b><span>${m(i.price)}</span></div><div class="lab">For ${esc(pname(i.pid))}${i.link?` · <a href="${esc(i.link)}" target="_blank" rel="noopener" style="color:var(--a)">link</a>`:''}</div><div class="st">${[1,2,3,4,5].map(n=>`<button data-act="star" data-id="${i.id}" data-n="${n}" class="${n<=i.stars?'on':''}" aria-label="${n} stars">★</button>`).join('')}</div><div class="row"><button class="btn" data-act="toGift" data-id="${i.id}">Move to gifts</button><span><button class="lk" data-act="editIdea" data-id="${i.id}">Edit</button><button class="lk x" data-act="delIdea" data-id="${i.id}">Delete</button></span></div></div>`).join('')}</div>`:'<div class="c e"><p class="lab">No ideas saved yet.</p></div>'}`},
+shop(){const todo=GS().filter(g=>!g.bought),G={};todo.forEach(g=>(G[g.store||'Anywhere']=G[g.store||'Anywhere']||[]).push(g));
+ return`<div class="bar"><span class="lab">Unbought gifts grouped by store. Tick items as you buy them.</span><span class="sp"></span><button class="btn pri" data-act="print">Print list</button></div>${todo.length?`<div class="g g3">${Object.keys(G).sort().map(s=>`<div class="c ls"><div class="row"><h2>${esc(s)}</h2><b>${m(sum(G[s]))}</b></div>${G[s].map(g=>`<div class="ln"><label><input type="checkbox" data-tg="bought" data-id="${g.id}">${esc(g.item)} <span class="lab">for ${esc(pname(g.pid))}</span></label><span>${m(g.price)}</span></div>`).join('')}</div>`).join('')}</div>`:'<div class="c e"><h2>Nothing left to buy</h2></div>'}`},
+set(){const l=L(),ago=S.saved?new Date(S.saved).toLocaleString('en-US'):'not yet';return`<div class="g g3 set"><div class="c"><h2>This list</h2><label>List name<input data-set="name" value="${esc(l.name)}"></label><label>Date<input type="date" data-set="date" value="${esc(l.date)}"></label><label>Total budget (0 adds up each person’s budget)<input type="number" min="0" step="0.01" data-set="budget" value="${l.budget}"></label><div class="g"><a class="btn" href="guide.html" style="text-align:center;text-decoration:none">📖 Open the user guide</a><button class="btn" data-act="dupList">Plan next year (copy this list)</button><button class="btn" data-act="pick">Add a list for another holiday</button><button class="btn" data-act="delList" style="color:var(--bad)">Delete this list</button></div></div>
+ <div class="c"><h2>Preferences</h2><label>Currency symbol<input data-pref="cur" maxlength="3" value="${esc(S.cur)}"></label><label>Estimated sales tax % (your state and city)<input type="number" min="0" max="15" step="0.01" data-pref="tax" value="${S.tax}"></label>${inst?'<button class="btn pri" data-act="install">Install as an app</button>':'<p class="lab">Tip: use your browser’s Install or Add to Home Screen to get an app icon. It works offline.</p>'}</div>
+ <div class="c"><h2>Data and saving</h2><p class="lab">Saved automatically on this device after every change. Last saved: ${ago}.<br>Protected storage: ${persisted===null?'unknown':persisted?'on':'not granted'}. ${navigator.onLine?'You are online.':'You are offline. Everything still works.'}</p><div class="g"><button class="btn pri" data-act="backup">Download backup (JSON)</button><button class="btn" data-act="restore">Restore from backup</button><button class="btn" data-act="csv">Export this list (CSV)</button><button class="btn" data-act="sample">Load sample list</button><button class="btn" data-act="erase" style="color:var(--bad)">Erase everything</button></div><p class="lab">Switching phones or clearing browser data? Download a backup first.</p></div></div>`}};
+function fillRows(){const q=F.q.toLowerCase(),R=GS().filter(g=>(!F.pid||g.pid===F.pid)&&(!q||(g.item+' '+pname(g.pid)+' '+g.store).toLowerCase().includes(q))&&(!F.st||(F.st==='todo'?!g.bought:!!g[F.st])));
+ $('#rows').innerHTML=R.length?R.map(g=>`<tr class="${g.sent?'d':''}"><td>${esc(pname(g.pid))}</td><td>${esc(g.item)}</td><td>${esc(g.store)}</td><td>${esc(g.cat)}</td><td class="n">${m(g.price)}</td>${['bought','wrapped','sent'].map(k=>`<td class="k"><input type="checkbox" data-tg="${k}" data-id="${g.id}" ${g[k]?'checked':''} aria-label="${k}"></td>`).join('')}<td>${esc(g.delivery)}</td><td class="a"><button class="lk" data-act="editGift" data-id="${g.id}">Edit</button><button class="lk x" data-act="delGift" data-id="${g.id}">Delete</button></td></tr>`).join(''):'<tr><td colspan="10" class="lab" style="text-align:center;padding:26px">No gifts match. Add one with the button above.</td></tr>'}
+function render(){const has=S.lists.length;if(!has)tab='pick';const l=has&&L(),h=has?HD(l.hid):H[0],r=document.documentElement;
+ r.dataset.t=S.dark?'dark':'light';r.style.setProperty('--a',h.a);r.style.setProperty('--b',h.b);document.querySelector('meta[name=theme-color]').content=h.a;
+ $('#fav').href='data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">${h.e[0]}</text></svg>`);
+ $('#top').innerHTML=`<div class="brand"><span>${h.e[0]}</span>Gift Tracker</div><span class="sp"></span>${has?`<select data-sel aria-label="Choose list">${S.lists.map(x=>`<option value="${x.id}" ${x.id===l.id?'selected':''}>${HD(x.hid).e[0]} ${esc(x.name)}</option>`).join('')}</select><button class="btn" data-act="pick" aria-label="New list">＋</button>`:''}<button class="tg" data-act="theme" role="switch" aria-checked="${S.dark}" aria-label="Dark mode"><i>${S.dark?'🌙':'☀️'}</i></button>`;
+ $('#nav').style.display=has?'':'none';$('#nav').innerHTML=tabs.map(t=>`<button data-act="tab" data-id="${t[0]}" class="${t[0]===tab?'on':''}"><span>${t[1]}</span>${t[2]}</button>`).join('');
+ $('#main').innerHTML=views[tab]();if(tab==='gifts')fillRows()}
+/* ---------- forms ---------- */
+function form(title,fields,v,cb){const d=$('#dlg');
+ d.innerHTML=`<form><h2>${title}</h2>${fields.map(f=>`<label>${f.l}${f.o?`<select name="${f.k}">${f.o.map(o=>{const a=Array.isArray(o)?o:[o,o];return`<option value="${esc(a[0])}" ${String(v[f.k]==null?'':v[f.k])===String(a[0])?'selected':''}>${esc(a[1])}</option>`}).join('')}</select>`:`<input name="${f.k}" type="${f.t||'text'}" ${f.t==='number'?'step="0.01" min="0"':''} value="${esc(v[f.k]==null?'':v[f.k])}" ${f.r?'required':''}>`}</label>`).join('')}<div class="row"><button type="button" class="btn" data-act="closeDlg">Cancel</button><button class="btn pri">Save</button></div></form>`;
+ d.querySelector('form').onsubmit=e=>{e.preventDefault();cb(Object.fromEntries(new FormData(e.target)));d.close();save();render()};d.showModal()}
+const po=()=>S.people.map(p=>[p.id,p.name]);
+function giftForm(v,cb){if(!S.people.length){toast('Add a recipient first');tab='people';render();return}form(v.id?'Edit gift':'Add gift',[{k:'pid',l:'Recipient',o:po()},{k:'item',l:'Gift',r:1},{k:'price',l:'Price',t:'number'},{k:'store',l:'Store or website'},{k:'cat',l:'Category',o:CT},{k:'delivery',l:'Delivery',o:DL}],v,cb)}
+const personForm=(v,cb)=>form(v.id?'Edit recipient':'Add recipient',[{k:'name',l:'Name',r:1},{k:'budget',l:'Budget for this list',t:'number'},{k:'group',l:'Group',o:GR},{k:'notes',l:'Notes (sizes, likes, allergies)'}],v,cb);
+const ideaForm=(v,cb)=>form(v.id?'Edit idea':'Add idea',[{k:'item',l:'Idea',r:1},{k:'pid',l:'For',o:[['','Anyone'],...po()]},{k:'price',l:'Rough price',t:'number'},{k:'link',l:'Link',t:'url'},{k:'stars',l:'Priority',o:[[1,'1 star'],[2,'2 stars'],[3,'3 stars'],[4,'4 stars'],[5,'5 stars']]}],v,cb);
+const find=(a,id)=>a.find(x=>x.id===id);
+const cell=v=>'"'+String(v).replace(/"/g,'""')+'"',toCsv=r=>[['Recipient','Gift','Store','Category','Price','Bought','Wrapped','Sent','Delivery'],...r].map(x=>x.map(cell).join(',')).join('\n');
+function dl(n,t,ty){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:ty}));a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),600)}
+function newList(hid,date){const h=HD(hid),d=date||nextDate(h),l={id:uid(),hid,name:h.n+' '+d.getFullYear(),date:iso(d),budget:0,pb:{}};S.lists.push(l);S.sel=l.id;tab='dash';return l}
+function sample(){if(S.gifts.length&&!confirm('Add sample data to your current data?'))return;const l=S.lists.length?L():newList('xmas');l.pb=l.pb||{};
+ const mk=(name,b,group,notes)=>{const p={id:uid(),name,group,notes};S.people.push(p);l.pb[p.id]=b;return p.id},a=mk('Mom',150,'Family','Size M, loves gardening'),d=mk('Dad',120,'Family',''),e=mk('Emily',80,'Friends',''),o=mk('Olivia',60,'Kids','Age 7, likes crafts'),mi=mk('Michael',90,'Coworkers',''),s=mk('Sophia',70,'Friends','');
+ const G=(p,item,price,store,cat,delivery,b,w,x)=>S.gifts.push({id:uid(),eid:l.id,pid:p,item,price,store,cat,delivery,bought:!!b,wrapped:!!w,sent:!!x});
+ G(a,'Cashmere cardigan',89,'Nordstrom','Clothing','In person',1,1,0);G(a,'Garden tool set',45,'Target','Home','In person',1,0,0);G(a,'Candle trio',32,'Etsy','Home','Mail',0,0,0);G(d,'Leather wallet',55,'Macy’s','Clothing','In person',1,1,1);G(d,'Wireless headphones',79,'Amazon','Tech','Mail',1,0,0);G(e,'Jewelry dish',38,'Etsy','Home','Mail',1,1,0);G(e,'Book box set',52,'Amazon','Books','Mail',0,0,0);G(e,'Spa voucher',40,'Local spa','Experience','In person',0,0,0);G(o,'Board game',35,'Amazon','Toys','Mail',0,0,0);G(o,'Craft kit',25,'Michaels','Toys','In person',1,1,0);G(mi,'Coffee sampler',30,'Trade Coffee','Food','Mail',1,0,0);G(s,'Planner',28,'Papier','Other','Mail',0,0,0);
+ S.ideas.push({id:uid(),eid:l.id,item:'Weekend spa voucher',pid:a,price:90,link:'',stars:4},{id:uid(),eid:l.id,item:'Desk plant',pid:'',price:20,link:'',stars:2});tab='dash'}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act,id=b.dataset.id,fin=()=>{save();render()};
+ const A={tab(){tab=id;render()},pick(){tab='pick';render()},theme(){S.dark=!S.dark;fin()},closeDlg(){$('#dlg').close()},print(){window.print()},
+ newList(){newList(id);fin()},
+ dupList(){const l=L(),d=new Date(l.date+'T00:00:00');d.setFullYear(d.getFullYear()+1);const n=newList(l.hid,d);n.budget=l.budget;n.pb={...l.pb};GS;S.gifts.filter(g=>g.eid===l.id).forEach(g=>S.gifts.push({...g,id:uid(),eid:n.id,bought:false,wrapped:false,sent:false}));S.ideas.filter(i=>i.eid===l.id).forEach(i=>S.ideas.push({...i,id:uid(),eid:n.id}));toast('Next year’s list is ready');fin()},
+ delList(){const l=L();if(confirm('Delete “'+l.name+'” and its gifts?')){S.lists=S.lists.filter(x=>x.id!==l.id);S.gifts=S.gifts.filter(g=>g.eid!==l.id);S.ideas=S.ideas.filter(i=>i.eid!==l.id);S.sel=S.lists[0]?S.lists[0].id:'';tab=S.lists.length?'dash':'pick';fin()}},
+ addGift(){giftForm({pid:S.people[0]&&S.people[0].id,cat:'Other',delivery:'In person'},v=>S.gifts.push({id:uid(),eid:L().id,...v,bought:false,wrapped:false,sent:false}))},
+ editGift(){giftForm(find(S.gifts,id),v=>Object.assign(find(S.gifts,id),v))},delGift(){if(confirm('Delete this gift?')){S.gifts=S.gifts.filter(x=>x.id!==id);fin()}},
+ addPerson(){personForm({group:'Family'},v=>{const p={id:uid(),name:v.name,group:v.group,notes:v.notes};S.people.push(p);L().pb[p.id]=+v.budget||0})},
+ editPerson(){const p=find(S.people,id);personForm({...p,budget:pbud(p)},v=>{Object.assign(p,{name:v.name,group:v.group,notes:v.notes});L().pb[p.id]=+v.budget||0})},
+ delPerson(){if(confirm('Remove this recipient and their gifts?')){S.people=S.people.filter(x=>x.id!==id);S.gifts=S.gifts.filter(g=>g.pid!==id);fin()}},
+ addIdea(){ideaForm({stars:3},v=>S.ideas.push({id:uid(),eid:L().id,...v,stars:+v.stars}))},editIdea(){ideaForm(find(S.ideas,id),v=>Object.assign(find(S.ideas,id),v,{stars:+v.stars}))},
+ delIdea(){S.ideas=S.ideas.filter(x=>x.id!==id);fin()},star(){find(S.ideas,id).stars=+b.dataset.n;fin()},
+ toGift(){const i=find(S.ideas,id);if(!S.people.length){toast('Add a recipient first');return}S.gifts.push({id:uid(),eid:L().id,pid:i.pid||S.people[0].id,item:i.item,price:i.price,store:'',cat:'Other',delivery:'In person',bought:false,wrapped:false,sent:false});S.ideas=S.ideas.filter(x=>x.id!==id);toast('Moved to gifts');fin()},
+ sample(){sample();fin()},csv(){dl(L().name.replace(/\s+/g,'-')+'.csv',toCsv(GS().map(g=>[pname(g.pid),g.item,g.store,g.cat,g.price,g.bought?'Yes':'No',g.wrapped?'Yes':'No',g.sent?'Yes':'No',g.delivery])),'text/csv')},
+ backup(){dl('gift-tracker-backup-'+iso(new Date())+'.json',JSON.stringify(S),'application/json');toast('Backup downloaded')},restore(){$('#file').click()},
+ install(){inst.prompt();inst=null;render()},
+ erase(){if(confirm('Erase ALL data on this device? This cannot be undone. Download a backup first.')){S=blank();tab='pick';fin()}}};
+ if(A[a])A[a]()});
+document.addEventListener('change',e=>{const t=e.target,d=t.dataset;
+ if(d.tg){const g=find(S.gifts,d.id),k=d.tg;g[k]=t.checked;if(t.checked&&k!=='bought')g.bought=true;if(t.checked&&k==='sent')g.wrapped=true;if(!t.checked&&k==='bought'){g.wrapped=false;g.sent=false}if(!t.checked&&k==='wrapped')g.sent=false;save();render()}
+ else if(d.set){const l=L();l[d.set]=d.set==='budget'?+t.value||0:t.value;save();render()}
+ else if(d.pref!==undefined){S[d.pref]=d.pref==='tax'?+t.value||0:t.value;save();render()}
+ else if(d.sel!==undefined){S.sel=t.value;tab='dash';save();render()}
+ else if(d.f&&t.tagName==='SELECT'){F[d.f]=t.value;fillRows()}
+ else if(t.id==='file'&&t.files[0]){const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.lists||!x.people)throw 0;S=Object.assign(blank(),x);tab='dash';save();render();toast('Backup restored')}catch(z){toast('That file is not a Gift Tracker backup')}};r.readAsText(t.files[0]);t.value=''}});
+document.addEventListener('input',e=>{if(e.target.dataset.f==='q'){F.q=e.target.value;fillRows()}});
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();inst=e;if(tab==='set')render()});
+window.addEventListener('online',()=>{toast('Back online');if(tab==='set')render()});window.addEventListener('offline',()=>{toast('You are offline. Everything still works.');if(tab==='set')render()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&S.lists.length)save()});
+if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
+render();
+</script>
+</body>
+</html>
